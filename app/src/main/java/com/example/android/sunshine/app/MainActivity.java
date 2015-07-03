@@ -1,25 +1,14 @@
 package com.example.android.sunshine.app;
 
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 
 /**
  * Main activity for the app. Creates a
- * {@link com.example.android.sunshine.app.MainActivity.PlaceholderFragment} containing a view
+ * {@link ForecastFragment} containing a view
  */
 public class MainActivity extends ActionBarActivity {
 
@@ -29,7 +18,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.container, new ForecastFragment())
                     .commit();
         }
     }
@@ -54,42 +43,5 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-
-            // obtain the root view via the 'main' fragment
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-            // create some 'entries' to display
-            final int nEntries = 15;
-            List<String> objects = new ArrayList<>();
-            for (int i = 0; i < nEntries; i++) {
-                objects.add(UUID.randomUUID().toString());
-            }
-
-            // create the array adapter for the ListView
-            FragmentActivity activity = getActivity();
-            int resource = R.layout.list_item_forecast;
-            int textViewResourceId = R.id.list_item_forecast_textview;
-            ArrayAdapter<String> arrayAdapter =
-                    new ArrayAdapter<>(activity, resource, textViewResourceId, objects);
-
-            // associate adapter to ListView
-            ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-            listView.setAdapter(arrayAdapter);
-
-            return rootView;
-        }
     }
 }
