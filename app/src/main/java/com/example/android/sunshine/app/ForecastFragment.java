@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -65,15 +66,23 @@ public class ForecastFragment extends Fragment {
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(arrayAdapter);
 
-//        Void params = null;
-//        AsyncTask<Void, Void, String> asyncTask = new FetchWeatherTask().execute(params);
-
         return rootView;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.forecastfragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_refresh) {
+            Void params = null;
+            AsyncTask<Void, Void, String> asyncTask = new FetchWeatherTask().execute(params);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**
