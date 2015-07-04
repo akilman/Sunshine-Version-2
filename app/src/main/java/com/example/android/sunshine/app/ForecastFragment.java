@@ -1,5 +1,6 @@
 package com.example.android.sunshine.app;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -77,8 +78,8 @@ public class ForecastFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
-            Void params = null;
-            AsyncTask<Void, Void, String> asyncTask = new FetchWeatherTask().execute(params);
+            int zipCode = 94089;
+            AsyncTask<Integer, Void, String> asyncTask = new FetchWeatherTask().execute(zipCode);
             return true;
         }
 
@@ -88,19 +89,19 @@ public class ForecastFragment extends Fragment {
     /**
      * Instance of an {@link AsyncTask} for fetching the weather
      */
-    class FetchWeatherTask extends AsyncTask<Void, Void, String> {
+    class FetchWeatherTask extends AsyncTask<Integer, Void, String> {
 
         public final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
         @Override
-        protected String doInBackground(Void... params) {
-            return fetchForecast();
+        protected String doInBackground(Integer... params) {
+            return fetchForecast(params);
         }
 
         /**
          * Helper method to return the forecast of a given zipcode in JSON format
          */
-        public String fetchForecast() {
+        public String fetchForecast(Integer... params) {
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -115,12 +116,24 @@ public class ForecastFragment extends Fragment {
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
 
-                int zipCode = 94089;
                 String mode = "json";
                 String units = "metric";
                 int nDays = 7;
-                String urlFormat = "http://api.openweathermap.org/data/2.5/forecast/daily?q=%d&mode=%s&units=%s&cnt=%d";
-                String urlString = String.format(urlFormat, zipCode, mode, units, nDays);
+                int zipCode = params[0];
+
+                Uri.Builder uriBuiler = new Uri.Builder();
+                uriBuiler.scheme("http")
+                        .authority("api.openweathermap.org")
+                        .appendPath("data")
+                        .appendPath("2.5")
+                        .appendPath("forecast")
+                        .appendPath("daily")
+                        .appendQueryParameter("q", String.valueOf(zipCode))
+                        .appendQueryParameter("mode", mode)
+                        .appendQueryParameter("units", units)
+                        .appendQueryParameter("cnt", String.valueOf(nDays));
+
+                String urlString = uriBuiler.build().toString();
                 URL url = new URL(urlString);
 
                 // Create the request to OpenWeatherMap, and open the connection
@@ -151,6 +164,7 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
+                Log.i(LOG_TAG, forecastJsonStr);
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
@@ -168,6 +182,8 @@ public class ForecastFragment extends Fragment {
                     }
                 }
             }
+
+            Log.i(LOG_TAG, "done!");
 
             return forecastJsonStr;
         }
